@@ -3,6 +3,7 @@ import pika
 import json
 import time 
 import os 
+import logging
 time_str = time.strftime('%Y%m%d_%H%M%S')
 
 
@@ -19,7 +20,24 @@ channel.exchange_declare(exchange='video_processing', exchange_type='fanout')
 channel.queue_declare(queue='metadata_extraction')
 channel.queue_bind(exchange='video_processing', queue='metadata_extraction')
 
+def save_metadata(metadata_dir, video_path, metadata):
+ 
+    try:
+      
+        os.makedirs(metadata_dir, exist_ok=True)
 
+        filename = os.path.splitext(os.path.basename(video_path))[0]
+        file_path = os.path.join(metadata_dir, f"{filename}_metadata.json")
+
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(metadata, f, indent=4)
+        
+        logging.info(f"Metadata saved successfully: {file_path}")
+        return file_path
+        
+    except Exception as e:
+        logging.error(f"Error while saving metadata: {str(e)}")
+        return None
 
 def extract_metadata(video_path):
 
@@ -37,9 +55,10 @@ def extract_metadata(video_path):
         else:
             metadata = {}
 
-        file_path = os.basename(video_path)
-        outpath_path = os.path.join(outpath_path,)
-        print(f" [x] Metadata Extracted: {metadata} at {time_str}")
+        filepath = save_metadata(metadata_dir='metadata',video_path=video_path,metadata=metadata)
+
+        print(f" [x] Metadata Extracted: {metadata} at {time_str} saved in {filepath}")
+
 
         return metadata
     
@@ -49,6 +68,7 @@ def extract_metadata(video_path):
 
 
 def callback(ch, method, properties, body):
+    
     """Processes messages from RabbitMQ"""
     message = json.loads(body)
     video_path = message['video_path']

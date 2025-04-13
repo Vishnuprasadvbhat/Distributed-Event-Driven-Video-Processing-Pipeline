@@ -16,10 +16,12 @@ time_str = time.strftime('%Y%m%d_%H%M%S')
 app = FastAPI()
 
 app.mount('/static',StaticFiles(directory="static"),name='static')
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/workers/enhanced_videos/", StaticFiles(directory="workers/enhanced_videos"), name="enhanced_videos")
 templates = Jinja2Templates(directory='templates')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_DIR = os.path.join(BASE_DIR, "videos") 
+UPLOAD_DIR = os.path.join(BASE_DIR, "uploads") 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -44,8 +46,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 async def home(request: Request):
     return templates.TemplateResponse('index.html', {'request': request}) 
 
-@app.post("/upload/")
-async def upload_video(file: UploadFile = File(...)):
+@app.post("/upload")
+async def upload_video(request: Request, file: UploadFile = File(...)):
     video_path = os.path.join(UPLOAD_DIR, file.filename)
     print(video_path)
 
@@ -69,7 +71,19 @@ async def upload_video(file: UploadFile = File(...)):
         print(f" [!] Failed to publish message to RabbitMQ: {e}")
         return JSONResponse(status_code=500, content={"error": "Failed to publish task to queue"})
 
-    return JSONResponse(content={"message": "Upload Successful", "video": file.filename, 'video_path': video_path}, status_code=200)
+    applied_filters = [
+    "Brightness +20%",
+    "Contrast ×1.5",
+    "Frame Rate: 60 fps",
+    "Resolution: 1920x1080"
+]
+    return templates.TemplateResponse("results.html", {
+        "request": request,
+        "original_url": f"/uploads/{file.filename}",
+        "enhanced_url": f"/workers/enhanced_videos/enhanced_{file.filename}",
+        "filename": file.filename,
+        "filters": applied_filters
+    })
 
 
 @app.post("/internal/video-enhancement-status/")

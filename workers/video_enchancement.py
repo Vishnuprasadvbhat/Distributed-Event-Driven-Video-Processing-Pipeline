@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 time_str = time.strftime('%Y%m%d_%H%M%S')
 
 # Output directory setup
-OUTPUT_DIR = os.path.join("new_files")  
+OUTPUT_DIR = os.path.join("enhanced_videos")  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def get_video_resolution(video_path):
@@ -40,8 +40,11 @@ def get_video_resolution(video_path):
         logging.info('Error: Exception')
         return None, None
 
+import os
+import logging
+import ffmpeg
+
 def enhance_video(video_path, output_dir):
-    
     if not os.path.exists(video_path):
         logging.info('Path Error: File not Found')
         return None
@@ -50,32 +53,39 @@ def enhance_video(video_path, output_dir):
         os.makedirs(output_dir)
 
     filename = os.path.basename(video_path)
-    output_path = os.path.join(output_dir, f"enhanced_{filename}_{time_str}") 
+    output_path = os.path.join(output_dir, f"enhanced_{filename}")
 
-    width, height = get_video_resolution(video_path)
-    if width is None or height is None:
-        return None
+    # Ensure .mp4 extension
+    if not output_path.endswith('.mp4'):
+        output_path += '.mp4'
 
     try:
-        video_filters = (
-        ffmpeg.input(video_path)
-        .filter("eq", brightness=0.2, contrast=1.5)
-        .filter("fps", fps=60)
-        .filter("scale", 1920, 1080)
-    )
+    
+        stream = (
+            ffmpeg.input(video_path)
+            .filter("eq", brightness=0.2, contrast=1.5)
+            .filter("fps", fps=60)
+            .filter("scale", 1920, 1080)
+        )
 
-        if not output_path.endswith(('.mp4', '.avi', '.mov', '.mkv')):
-            output_path += '.mp4' 
         
-        ffmpeg.output(video_filters, output_path).run(overwrite_output=True, capture_stdout=True, capture_stderr=True)
+        stream = ffmpeg.output(
+            stream,
+            output_path,
+            vcodec='libx264',
+            preset='fast',
+            crf=23,
+            acodec='aac',
+            movflags='+faststart'
+        )
+
+        ffmpeg.run(stream, overwrite_output=True, capture_stdout=True, capture_stderr=True)
         return output_path
 
-    
     except ffmpeg.Error as e:
         stderr = e.stderr.decode() if hasattr(e, 'stderr') and e.stderr else "Unknown error"
-        logging.error(f'FFMpeg Error: {stderr}')
+        logging.error(f'FFmpeg Error: {stderr}')
         return None
-
 
     
 def callback(ch, method, properties, body):

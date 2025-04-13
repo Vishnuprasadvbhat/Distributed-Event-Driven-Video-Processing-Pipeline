@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <title>Uploaded & Enhanced Video</title>
+  <style>
+    .video-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    .video-box {
+      text-align: center;
+    }
+
+    .download-btn {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h2>Compare Videos Side by Side</h2>
+    
+    <div class="video-container">
+      <!-- Original -->
+      <div class="video-box">
+        <h3>Original</h3>
+        <video width="480" controls preload="auto">
+          <source src="{{ original_url }}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <br />
+        <a href="{{ original_url }}" download><button class="download-btn">Download Original</button></a>
+      </div>
+
+      <!-- Enhanced -->
+      <div class="video-box">
+        <h3>Enhanced</h3>
+        <video width="480" controls preload="auto">
+          <source src="{{ enhanced_url }}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <br />
+        <a href="{{ enhanced_url }}" download><button class="download-btn">Download Enhanced</button></a>
+        <p> Brightness +20%, Contrast ×1.5, Frame Rate: 60 fps, Resolution: 1920x1080 </p>
+      </div>
+      
+    </div>
+    <br><br>
+    <a href="/upload"><button>Upload Another</button></a>
+  </div>
+</body>
+</html>
