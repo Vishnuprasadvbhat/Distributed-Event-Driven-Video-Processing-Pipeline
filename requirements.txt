@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pika
+ffmpeg-python
+websockets 
+aiofiles
+python-multipart
+watchgod
+jinja2
