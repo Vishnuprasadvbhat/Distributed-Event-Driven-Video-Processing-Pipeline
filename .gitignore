@@ -145,7 +145,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
-
+/vidoes
+.vidoes
 # mypy
 .mypy_cache/
 .dmypy.json
