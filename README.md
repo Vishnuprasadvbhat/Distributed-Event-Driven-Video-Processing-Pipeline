@@ -78,20 +78,20 @@ docker run -it --rm --name rabbitmq -p 5672:5672 rabbitmq
 ## Running the System
 1. Start the server:
 ```bash
-uvicorn assignment.server:app --reload
+uvicorn server:app --reload
 ```
 
 2. Start the Queue in a terminal:
 
 ```bash 
-python assignment/queues/pika_publisher.py
+python queues/pika_publisher.py
 ```
 
 3. Start the workers in separate terminals:
 
 ```bash
-python assignment/workers/video_enhancement.py
-python assignment/workers/metadata_extractor.py
+python workers/video_enhancement.py
+python workers/metadata_extractor.py
 ```
 
 ## API Documentation
