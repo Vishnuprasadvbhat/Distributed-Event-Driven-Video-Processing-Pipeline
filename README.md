@@ -81,7 +81,14 @@ docker run -it --rm --name rabbitmq -p 5672:5672 rabbitmq
 uvicorn assignment.server:app --reload
 ```
 
-2. Start workers in separate terminals:
+2. Start the Queue in a terminal:
+
+```bash 
+python assignment/queues/pika_publisher.py
+```
+
+3. Start the workers in separate terminals:
+
 ```bash
 python assignment/workers/video_enhancement.py
 python assignment/workers/metadata_extractor.py
