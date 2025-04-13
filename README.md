@@ -254,14 +254,10 @@ Metadata Output (JSON):
 ```
 
 ## Development Guide
-### Testing
-Run the test suite:
-```bash
-python -m pytest assignment/test.py
-```
 
 ### Debugging
-Enable debug logging:
+Enabled debug logging:
+
 ```python
 # In any worker file
 logging.basicConfig(level=logging.DEBUG)
